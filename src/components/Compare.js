@@ -15,16 +15,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import map from "lodash/map";
 import get from "lodash/get";
 import set from "lodash/set";
+import TvDetails from "./TvDetails";
 
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
-import CardMedia from "@material-ui/core/CardMedia";
-
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-
+const allowToCompare = 2;
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -48,9 +41,6 @@ const Compare = () => {
   const classes = useStyles();
   const [featuresList, setFeaturesList] = useState([]);
   const [tvs, setTvs] = useState({});
-
-  const [selectedModel, setSelectedModel] = useState("");
-  const [selectedTv, setSelectedTv] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -100,14 +90,6 @@ const Compare = () => {
     fetchData();
   }, [setFeaturesList, setTvs]);
 
-  const handleChange = (event) => {
-    const selected = event.target.value;
-    setSelectedModel(selected);
-    if (selected) {
-      setSelectedTv(tvs[selected]);
-    }
-  };
-
   const featuresListEle = Object.keys(featuresList).map((key) => {
     const items = featuresList[key].map((item) => {
       return (
@@ -127,17 +109,13 @@ const Compare = () => {
     );
   });
 
-  const tvSelectOption = Object.keys(tvs).map((key) => (
-    <MenuItem value={key}>{tvs[key].title}</MenuItem>
-  ));
-
   return (
     <React.Fragment>
       <Container maxWidth="xl" className={classes.root}>
         <Card>
           <CardContent>
             <Grid container>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <div className={classes.paper}>
                   <div className={classes.particularHead}>
                     <h2>Compare</h2>
@@ -145,61 +123,9 @@ const Compare = () => {
                   <List>{featuresListEle}</List>
                 </div>
               </Grid>
-
-              <Grid item xs={4}>
-                <div className={classes.div}>
-                  <div>
-                    <img
-                      className={classes.media}
-                      src={
-                        selectedTv !== null && selectedTv !== ""
-                          ? selectedTv.image
-                          : "https://dummyimage.com/300x200/c3c3c3/c3c3c3.png"
-                      }
-                      alt=""
-                    />
-                    {/*  */}
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="demo-simple-select-label">
-                        Choose a product
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={selectedModel}
-                        onChange={handleChange}
-                      >
-                        <MenuItem value="">Choose a Product</MenuItem>
-                        {tvSelectOption}
-                      </Select>
-                    </FormControl>
-                  </div>
-                  <List>
-                    {selectedTv !== null && selectedTv !== ""
-                      ? Object.keys(featuresList).map((key) => {
-                          const items = featuresList[key].map((item) => {
-                            const val = selectedTv[key][item];
-                            console.log(val);
-                            return (
-                              <ListItem>
-                                <ListItemText primary={val} />
-                              </ListItem>
-                            );
-                          });
-
-                          return (
-                            <React.Fragment>
-                              <ListItem className={classes.headerItem}>
-                                <ListItemText primary="&nbsp;" />
-                              </ListItem>
-                              {items}
-                            </React.Fragment>
-                          );
-                        })
-                      : null}
-                  </List>
-                </div>
-              </Grid>
+              {Array.from(Array(allowToCompare)).map((i) => (
+                <TvDetails tvs={tvs} featuresList={featuresList} eleIndex={i} />
+              ))}
             </Grid>
           </CardContent>
         </Card>
